@@ -4,7 +4,8 @@
 <img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat">
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 
-This library apply video filter on generate an Mp4 and on ExoPlayer video and Video Recording with Camera2.
+This library apply video filter on generate an Mp4 and on ExoPlayer video and Video Recording with Camera2.<br>
+Android MediaCodec API is used this library.
 
 #### apply video filter on generate an Mp4 
 <table>
