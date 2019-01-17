@@ -9,9 +9,9 @@ This library apply video filter on generate an Mp4 and on ExoPlayer video and Vi
 #### apply video filter on generate an Mp4 
 <table>
     <td><img src="art/sample.gif"><br>Sample Video<br>No filter</td>
-    <td><img src="art/grayscale.gif" ><br><a href="mp4compose/src/main/java/com/daasuu/mp4compose/filter/GlGrayScaleFilter.java">GlGlayScaleFilter</a><br> apply</td>
-    <td><img src="art/monochrome.gif" ><br><a href="mp4compose/src/main/java/com/daasuu/mp4compose/filter/GlMonochromeFilter.java">GlMonochromeFilter</a><br> apply</td>
-    <td><img src="art/watermark.gif" ><br><a href="mp4compose/src/main/java/com/daasuu/mp4compose/filter/GlWatermarkFilter.java">GlWatermarkFilter</a><br> apply</td>
+    <td><img src="art/grayscale.gif" ><br><a href="https://github.com/MasayukiSuda/GPUVideo-android/blob/master/gpuv/src/main/java/com/daasuu/gpuv/egl/filter/GlGrayScaleFilter.java">GlGlayScaleFilter</a><br> apply</td>
+    <td><img src="art/monochrome.gif" ><br><a href="https://github.com/MasayukiSuda/GPUVideo-android/blob/master/gpuv/src/main/java/com/daasuu/gpuv/egl/filter/GlMonochromeFilter.java">GlMonochromeFilter</a><br> apply</td>
+    <td><img src="art/watermark.gif" ><br><a href="https://github.com/MasayukiSuda/GPUVideo-android/blob/master/gpuv/src/main/java/com/daasuu/gpuv/egl/filter/GlWatermarkFilter.java">GlWatermarkFilter</a><br> apply</td>
 </table>
 
 #### apply video filter on ExoPlayer video
