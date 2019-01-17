@@ -20,6 +20,25 @@ This library apply video filter on generate an Mp4 and on ExoPlayer video and Vi
 #### apply video filter on Video Recording with Camera2.
 <img src="art/camera.gif" width="33.33%">
 
+## Gradle
+Step 1. Add the JitPack repository to your build file
+```groovy
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
+Step 2. Add the dependency
+```groovy
+dependencies {
+        implementation 'com.github.MasayukiSuda:GPUVideo-android:v0.1.0'
+        // if apply video filter on ExoPlayer video
+        implementation 'com.google.android.exoplayer:exoplayer-core:2.9.3'
+}
+```
+
 
 ## References And Special Thanks to
 * [android-transcoder](https://github.com/ypresto/android-transcoder)
