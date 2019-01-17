@@ -190,6 +190,49 @@ Other methods.
 
 
 
+## Filters
+ - Bilateral		
+ - BoxBlur		
+ - Brightness		
+ - BulgeDistortion		
+ - CGAColorspace		
+ - Contrast		
+ - Crosshatch		
+ - Exposure		
+ - FilterGroup		
+ - Gamma		
+ - GaussianBlur		
+ - GrayScale		
+ - Halftone		
+ - Haze		
+ - HighlightShadow		
+ - Hue		
+ - Invert		
+ - LookUpTable		
+ - Luminance		
+ - LuminanceThreshold		
+ - Monochrome		
+ - Opacity		
+ - Overlay		
+ - Pixelation		
+ - Posterize		
+ - RGB		
+ - Saturation		
+ - Sepia		
+ - Sharpen		
+ - Solarize		
+ - SphereRefraction		
+ - Swirl			
+ - ToneCurve		
+ - Tone		
+ - Vibrance		
+ - Vignette		
+ - Watermark		
+ - WeakPixelInclusion		
+ - WhiteBalance		
+ - ZoomBlur
+
+
 
 ## References And Special Thanks to
 * [android-transcoder](https://github.com/ypresto/android-transcoder)
