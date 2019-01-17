@@ -1,0 +1,6 @@
+<resources>
+  <string name="app_name">GPUVideoAndroid</string>
+  <string name="play">play</string>
+  <string name="pause">pause</string>
+  <string name="app_record">Record Video</string>
+</resources>
