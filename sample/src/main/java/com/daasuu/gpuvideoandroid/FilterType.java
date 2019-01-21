@@ -50,6 +50,7 @@ public enum FilterType {
     TONE,
     VIBRANCE,
     VIGNETTE,
+    WATERMARK,
     WEAK_PIXEL,
     WHITE_BALANCE,
     ZOOM_BLUR,
@@ -155,6 +156,8 @@ public enum FilterType {
                 return glVibranceFilter;
             case VIGNETTE:
                 return new GlVignetteFilter();
+            case WATERMARK:
+                return new GlWatermarkFilter(BitmapFactory.decodeResource(context.getResources(), R.drawable.sample_bitmap), GlWatermarkFilter.Position.RIGHT_BOTTOM);
             case WEAK_PIXEL:
                 return new GlWeakPixelInclusionFilter();
             case WHITE_BALANCE:
