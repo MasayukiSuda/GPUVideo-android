@@ -7,6 +7,13 @@
 This library apply video filter on generate an Mp4 and on ExoPlayer video and Video Recording with Camera2.<br>
 Android MediaCodec API is used this library.
 
+# Features
+* apply video filter, scale, and rotate Mp4.
+* apply video filter on ExoPlayer video.
+* apply video filter on Video Recording with Camera2.
+
+
+
 #### apply video filter on generate an Mp4 
 <table>
     <td><img src="art/sample.gif"><br>Sample Video<br>No filter</td>
