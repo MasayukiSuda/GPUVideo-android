@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+
+import com.daasuu.gpuv.egl.filter.GlFilter;
 import com.daasuu.gpuv.player.GPUPlayerView;
 import com.daasuu.gpuvideoandroid.widget.MovieWrapperView;
 import com.daasuu.gpuvideoandroid.widget.PlayerTimer;
@@ -36,9 +38,11 @@ public class PlayerActivity extends AppCompatActivity {
     private GPUPlayerView gpuPlayerView;
     private SimpleExoPlayer player;
     private Button button;
-    private SeekBar seekBar;
+    private SeekBar timeSeekBar;
+    private SeekBar filterSeekBar;
     private PlayerTimer playerTimer;
-
+    private GlFilter filter;
+    private FilterAdjuster adjuster;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +89,8 @@ public class PlayerActivity extends AppCompatActivity {
         });
 
         // seek
-        seekBar = (SeekBar) findViewById(R.id.seekBar);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        timeSeekBar = (SeekBar) findViewById(R.id.timeSeekBar);
+        timeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (player == null) return;
@@ -111,6 +115,26 @@ public class PlayerActivity extends AppCompatActivity {
             }
         });
 
+        filterSeekBar = (SeekBar) findViewById(R.id.filterSeekBar);
+        filterSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (adjuster != null) {
+                    adjuster.adjust(filter, progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // do nothing
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // do nothing
+            }
+        });
+
         // list
         ListView listView = findViewById(R.id.list);
         final List<FilterType> filterTypes = FilterType.createFilterList();
@@ -118,7 +142,10 @@ public class PlayerActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                gpuPlayerView.setGlFilter(FilterType.createGlFilter(filterTypes.get(position), getApplicationContext()));
+                filter = FilterType.createGlFilter(filterTypes.get(position), getApplicationContext());
+                adjuster = FilterType.createFilterAdjuster(filterTypes.get(position));
+                findViewById(R.id.filterSeekBarLayout).setVisibility(adjuster != null ? View.VISIBLE : View.GONE);
+                gpuPlayerView.setGlFilter(filter);
             }
         });
     }
@@ -162,8 +189,8 @@ public class PlayerActivity extends AppCompatActivity {
 
                 if (duration <= 0) return;
 
-                seekBar.setMax((int) duration / 1000);
-                seekBar.setProgress((int) position / 1000);
+                timeSeekBar.setMax((int) duration / 1000);
+                timeSeekBar.setProgress((int) position / 1000);
             }
         });
         playerTimer.start();

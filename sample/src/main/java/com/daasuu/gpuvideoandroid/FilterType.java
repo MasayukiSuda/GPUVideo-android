@@ -174,5 +174,19 @@ public enum FilterType {
         }
     }
 
+    public static FilterAdjuster createFilterAdjuster(FilterType filterType) {
+        switch (filterType) {
+            case BOX_BLUR: return new FilterAdjuster() {
+                @Override
+                public void adjust(GlFilter filter, int percentage) {
+                    ((GlBoxBlurFilter) filter).setBlurSize(FilterType.range(percentage, 0F, 1F));
+                }
+            };
+            default: return null;
+        }
+    }
 
+    private static float range(int percentage, float start, float end) {
+        return (end - start) * percentage / 100.0f + start;
+    }
 }
