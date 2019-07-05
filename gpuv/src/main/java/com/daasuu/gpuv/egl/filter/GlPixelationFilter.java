@@ -45,4 +45,8 @@ public class GlPixelationFilter extends GlFilter {
         GLES20.glUniform1f(getHandle("imageWidthFactor"), imageWidthFactor);
         GLES20.glUniform1f(getHandle("imageHeightFactor"), imageHeightFactor);
     }
+
+    public void setPixel(final float pixel) {
+        this.pixel = pixel;
+    }
 }
