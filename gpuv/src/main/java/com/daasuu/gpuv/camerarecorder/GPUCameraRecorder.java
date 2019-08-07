@@ -187,13 +187,21 @@ public class GPUCameraRecorder {
      * callback methods from encoder
      */
     private final MediaEncoder.MediaEncoderListener mediaEncoderListener = new MediaEncoder.MediaEncoderListener() {
+        private boolean videoStopped;
+        private boolean audioStopped;
+
         @Override
         public void onPrepared(final MediaEncoder encoder) {
             Log.v("TAG", "onPrepared:encoder=" + encoder);
             if (encoder instanceof MediaVideoEncoder) {
+                videoStopped = false;
                 if (glPreviewRenderer != null) {
                     glPreviewRenderer.setVideoEncoder((MediaVideoEncoder) encoder);
                 }
+            }
+
+            if (encoder instanceof MediaAudioEncoder) {
+                audioStopped = false;
             }
 
         }
@@ -202,9 +210,20 @@ public class GPUCameraRecorder {
         public void onStopped(final MediaEncoder encoder) {
             Log.v("TAG", "onStopped:encoder=" + encoder);
             if (encoder instanceof MediaVideoEncoder) {
+                videoStopped = true;
                 if (glPreviewRenderer != null) {
                     glPreviewRenderer.setVideoEncoder(null);
                 }
+            }
+            if (encoder instanceof MediaAudioEncoder) {
+                audioStopped = true;
+            }
+        }
+
+        @Override
+        public void onExit() {
+            if (videoStopped && audioStopped) {
+                cameraRecordListener.onVideoFileReady();
             }
         }
     };

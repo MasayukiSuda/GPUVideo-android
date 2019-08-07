@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 
 
 public abstract class MediaEncoder implements Runnable {
-    private static final String TAG = "MediaEncoder";
+    private final String TAG = getClass().getSimpleName();
 
     protected static final int TIMEOUT_USEC = 10000;    // 10[msec]
 
@@ -19,6 +19,8 @@ public abstract class MediaEncoder implements Runnable {
         void onPrepared(MediaEncoder encoder);
 
         void onStopped(MediaEncoder encoder);
+
+        void onExit();
     }
 
     protected final Object sync = new Object();
@@ -143,6 +145,7 @@ public abstract class MediaEncoder implements Runnable {
             requestStop = true;
             isCapturing = false;
         }
+        listener.onExit();
     }
 
     /*

@@ -9,7 +9,6 @@ import android.opengl.GLException;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,13 +16,16 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
+import androidx.appcompat.app.AppCompatActivity;
 import com.daasuu.gpuv.camerarecorder.CameraRecordListener;
 import com.daasuu.gpuv.camerarecorder.GPUCameraRecorder;
 import com.daasuu.gpuv.camerarecorder.GPUCameraRecorderBuilder;
 import com.daasuu.gpuv.camerarecorder.LensFacing;
 import com.daasuu.gpuvideoandroid.widget.SampleCameraGLView;
 
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.opengles.GL10;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,10 +34,6 @@ import java.nio.IntBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.opengles.GL10;
 
 public class BaseCameraActivity extends AppCompatActivity {
 
@@ -197,6 +195,11 @@ public class BaseCameraActivity extends AppCompatActivity {
                             });
                         }
                         toggleClick = false;
+                    }
+
+                    @Override
+                    public void onVideoFileReady() {
+
                     }
                 })
                 .videoSize(videoWidth, videoHeight)
