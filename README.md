@@ -44,7 +44,7 @@ allprojects {
 Step 2. Add the dependency
 ```groovy
 dependencies {
-        implementation 'com.github.MasayukiSuda:GPUVideo-android:v0.1.0'
+        implementation 'com.github.MasayukiSuda:GPUVideo-android:v0.1.1'
         // if apply video filter on ExoPlayer video
         implementation 'com.google.android.exoplayer:exoplayer-core:2.9.3'
 }
