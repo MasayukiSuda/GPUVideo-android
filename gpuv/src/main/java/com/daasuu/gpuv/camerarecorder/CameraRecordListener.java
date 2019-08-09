@@ -16,4 +16,8 @@ public interface CameraRecordListener {
 
     void onCameraThreadFinish();
 
+    /**
+     * Is called when native codecs finish to write file.
+     */
+    void onVideoFileReady();
 }
