@@ -1,10 +1,9 @@
 
 package com.daasuu.gpuv.composer;
 
-import android.media.MediaCodec;
-import android.media.MediaExtractor;
-import android.media.MediaFormat;
+import android.media.*;
 import android.util.Size;
+import android.view.Surface;
 import com.daasuu.gpuv.egl.filter.GlFilter;
 
 import java.io.IOException;
@@ -86,17 +85,43 @@ class VideoComposer {
         decoderSurface.setFlipVertical(flipVertical);
         decoderSurface.completeParams();
 
-        try {
-            decoder = MediaCodec.createDecoderByType(inputFormat.getString(MediaFormat.KEY_MIME));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-        decoder.configure(inputFormat, decoderSurface.getSurface(), null, 0);
+        decoder = configureDecoder(inputFormat, decoderSurface.getSurface());
         decoder.start();
         decoderStarted = true;
         decoderInputBuffers = decoder.getInputBuffers();
     }
 
+    private MediaCodec configureDecoder(MediaFormat format, Surface surface) {
+        if (format == null || surface == null) {
+            return null;
+        }
+        MediaCodec codec;
+        MediaCodecList list = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        MediaCodecInfo[] infos = list.getCodecInfos();
+        for (MediaCodecInfo info : infos) {
+            // try decoder
+            try {
+                codec = MediaCodec.createByCodecName(info.getName());
+            } catch (IOException e) {
+                continue;
+            }
+            try {
+                codec.configure(format, surface, null, 0);
+            } catch (IllegalArgumentException ignored) {
+                // configure() failed
+                codec.release();
+                continue;
+            } catch (IllegalStateException ignored) {
+                // configure() failed
+                codec.release();
+                continue;
+            }
+            // configure() successful
+            return codec;
+        }
+        // no decoder found
+        return null;
+    }
 
     boolean stepPipeline() {
         boolean busy = false;
