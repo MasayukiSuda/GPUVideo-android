@@ -6,11 +6,13 @@ import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.util.Log;
 import android.util.Size;
+
 import com.daasuu.gpuv.camerarecorder.capture.MediaAudioEncoder;
 import com.daasuu.gpuv.camerarecorder.capture.MediaEncoder;
 import com.daasuu.gpuv.camerarecorder.capture.MediaMuxerCaptureWrapper;
 import com.daasuu.gpuv.camerarecorder.capture.MediaVideoEncoder;
 import com.daasuu.gpuv.egl.GlPreviewRenderer;
+import com.daasuu.gpuv.egl.ScreenshotConsumer;
 import com.daasuu.gpuv.egl.filter.GlFilter;
 
 
@@ -132,6 +134,9 @@ public class GPUCameraRecorder {
         cameraHandler.startPreview(cameraWidth, cameraHeight);
     }
 
+    public void takeShot(ScreenshotConsumer screenshotConsumer) {
+        glPreviewRenderer.setScreenConsumer(screenshotConsumer);
+    }
 
     public void setFilter(final GlFilter filter) {
         if (filter == null) return;

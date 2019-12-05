@@ -1,10 +1,13 @@
 package com.daasuu.gpuv.egl;
 
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import com.daasuu.gpuv.egl.filter.GlFilter;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -24,6 +27,7 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
 
     private final Queue<Runnable> runOnDraw;
 
+    private ScreenshotConsumer screenshoter;
 
     protected GlFrameBufferObjectRenderer() {
         runOnDraw = new LinkedList<Runnable>();
@@ -55,6 +59,7 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
         }
         framebufferObject.enable();
 
+        maybeTakeScreenshot();
         onDrawFrame(framebufferObject);
 
         GLES20.glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -62,6 +67,31 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
         GLES20.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         normalShader.draw(framebufferObject.getTexName(), null);
 
+    }
+
+    private void maybeTakeScreenshot() {
+        if (screenshoter != null) {
+            int width = framebufferObject.getWidth();
+            int height = framebufferObject.getHeight();
+            int screenshotSize = width * height;
+            ByteBuffer bb = ByteBuffer.allocateDirect(screenshotSize * 4);
+            bb.order(ByteOrder.nativeOrder());
+            GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, bb);
+            int[] pixelsBuffer = new int[screenshotSize];
+            bb.asIntBuffer().get(pixelsBuffer);
+            bb = null;
+
+            for (int i = 0; i < screenshotSize; ++i) {
+                // The alpha and green channels' positions are preserved while the      red and blue are swapped
+                pixelsBuffer[i] = ((pixelsBuffer[i] & 0xff00ff00)) | ((pixelsBuffer[i] & 0x000000ff) << 16) | ((pixelsBuffer[i] & 0x00ff0000) >> 16);
+            }
+
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.setPixels(pixelsBuffer, screenshotSize - width, -width, 0, 0, width, height);
+
+            screenshoter.accept(bitmap);
+            screenshoter = null;
+        }
     }
 
     @Override
@@ -75,4 +105,7 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
 
     public abstract void onDrawFrame(GlFramebufferObject fbo);
 
+    public void setScreenConsumer(ScreenshotConsumer screenshoter) {
+        this.screenshoter = screenshoter;
+    }
 }
