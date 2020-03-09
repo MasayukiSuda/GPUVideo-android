@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 public class GlWhiteBalanceFilter extends GlFilter {
 
     private static final String WHITE_BALANCE_FRAGMENT_SHADER = "" +
+            "precision mediump float;" +
             " uniform lowp sampler2D sTexture;\n" +
             " varying vec2 vTextureCoord;\n" +
 
