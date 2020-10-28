@@ -189,6 +189,8 @@ public class GPUCameraRecorder {
     private final MediaEncoder.MediaEncoderListener mediaEncoderListener = new MediaEncoder.MediaEncoderListener() {
         private boolean videoStopped;
         private boolean audioStopped;
+        private boolean videoExitReady;
+        private boolean audioExitReady;
 
         @Override
         public void onPrepared(final MediaEncoder encoder) {
@@ -221,8 +223,14 @@ public class GPUCameraRecorder {
         }
 
         @Override
-        public void onExit() {
-            if (videoStopped && audioStopped) {
+        public void onExit(final MediaEncoder encoder) {
+            if (encoder instanceof MediaVideoEncoder && videoStopped) {
+                videoExitReady = true;
+            }
+            if (encoder instanceof MediaAudioEncoder && audioStopped) {
+                audioExitReady = true;
+            }
+            if (videoExitReady && audioExitReady) {
                 cameraRecordListener.onVideoFileReady();
             }
         }

@@ -20,7 +20,7 @@ public abstract class MediaEncoder implements Runnable {
 
         void onStopped(MediaEncoder encoder);
 
-        void onExit();
+        void onExit(MediaEncoder encoder);
     }
 
     protected final Object sync = new Object();
@@ -145,7 +145,7 @@ public abstract class MediaEncoder implements Runnable {
             requestStop = true;
             isCapturing = false;
         }
-        listener.onExit();
+        listener.onExit(this);
     }
 
     /*
