@@ -230,7 +230,7 @@ public class GPUCameraRecorder {
             if (encoder instanceof MediaAudioEncoder && audioStopped) {
                 audioExitReady = true;
             }
-            if (videoExitReady && audioExitReady) {
+            if (videoExitReady && (audioExitReady || mute)) {
                 cameraRecordListener.onVideoFileReady();
             }
         }
