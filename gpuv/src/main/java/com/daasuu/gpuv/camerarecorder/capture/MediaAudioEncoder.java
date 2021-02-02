@@ -37,9 +37,9 @@ public class MediaAudioEncoder extends MediaEncoder {
 
         final MediaFormat audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1);
         audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);
+        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_STEREO);
         audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
-        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
+        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 2);
         Log.i(TAG, "format: " + audioFormat);
         mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE);
         mediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
@@ -88,7 +88,7 @@ public class MediaAudioEncoder extends MediaEncoder {
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
             try {
                 final int min_buffer_size = AudioRecord.getMinBufferSize(
-                        SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+                        SAMPLE_RATE, AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT);
                 int buffer_size = SAMPLES_PER_FRAME * FRAMES_PER_BUFFER;
                 if (buffer_size < min_buffer_size)
@@ -99,7 +99,7 @@ public class MediaAudioEncoder extends MediaEncoder {
                     try {
                         audioRecord = new AudioRecord(
                                 source, SAMPLE_RATE,
-                                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
+                                AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
                         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
                             audioRecord = null;
                     } catch (final Exception e) {
