@@ -150,11 +150,11 @@ public class EncodeRenderHandler implements Runnable {
             System.arraycopy(texMatrix, 0, STMatrix, 0, 16);
             System.arraycopy(mvpMatrix, 0, MVPMatrix, 0, 16);
             // square対策
-            Matrix.scaleM(MVPMatrix,
+            /*Matrix.scaleM(MVPMatrix,
                     0,
-                    XMatrixScale, // ここをマイナスの値にするとflipする
-                    YMatrixScale, // 見た目との歪みもここで調整すればいけると思う。
-                    1);
+                    XMatrixScale, // ここをマイナスの値にするとflipする //If this is set to a negative value, it will flip
+                    YMatrixScale, // 見た目との歪みもここで調整すればいけると思う。// I think that the distortion with the appearance should be adjusted here.
+                    1);*/
             this.aspectRatio = aspectRatio;
             requestDraw++;
             sync.notifyAll();
