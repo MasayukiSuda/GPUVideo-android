@@ -90,6 +90,13 @@ public class GPUCameraRecorder {
         });
     }
 
+    public Size getFileSize() {
+        return new Size(fileWidth, fileHeight);
+    }
+
+    public LensFacing getLensFacing() {
+        return lensFacing;
+    }
 
     private synchronized void startPreview(SurfaceTexture surfaceTexture) {
         if (cameraHandler == null) {
