@@ -222,6 +222,7 @@ public class CameraThread extends Thread {
             e.printStackTrace();
         }
 
+        cameraRecordListener.onCameraThreadStarted();
         listener.onStart(cameraSize, flashSupport);
 
     }

@@ -27,8 +27,8 @@ public class GPUCameraRecorder {
     private boolean flashSupport = false;
 
     private MediaMuxerCaptureWrapper muxer;
-    private final int fileWidth;
-    private final int fileHeight;
+    private int fileWidth;
+    private int fileHeight;
 
     private final int cameraWidth;
     private final int cameraHeight;
@@ -92,6 +92,13 @@ public class GPUCameraRecorder {
 
     public Size getFileSize() {
         return new Size(fileWidth, fileHeight);
+    }
+
+    public void setFileSize(Size size) {
+        if (!isStarted()) {
+            fileHeight = size.getHeight();
+            fileWidth = size.getWidth();
+        }
     }
 
     public LensFacing getLensFacing() {
