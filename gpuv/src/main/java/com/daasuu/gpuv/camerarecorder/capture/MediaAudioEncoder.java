@@ -18,8 +18,11 @@ public class MediaAudioEncoder extends MediaEncoder {
 
     private AudioThread audioThread = null;
 
+    private AudioMeter audioMeter;
+
     public MediaAudioEncoder(final MediaMuxerCaptureWrapper muxer, final MediaEncoderListener listener) {
         super(muxer, listener);
+        audioMeter = AudioMeter.getInstance();
     }
 
     @Override
@@ -119,6 +122,7 @@ public class MediaAudioEncoder extends MediaEncoder {
                                     // read audio data from internal mic
                                     buf.clear();
                                     readBytes = audioRecord.read(buf, SAMPLES_PER_FRAME);
+                                    audioMeter.setBuffer(buf);
                                     if (readBytes > 0) {
                                         // set audio data to encoder
                                         buf.position(readBytes);

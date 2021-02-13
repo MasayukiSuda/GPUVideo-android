@@ -77,6 +77,7 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
 //        Log.d("GPUCameraRecorder ", "cameraPreviewWidth " + cameraPreviewWidth);
 //        Log.d("GPUCameraRecorder ", "cameraPreviewHeight " + cameraPreviewHeight);
 
+        isLandscapeDevice = false;
 
         if (isLandscapeDevice) {
 
