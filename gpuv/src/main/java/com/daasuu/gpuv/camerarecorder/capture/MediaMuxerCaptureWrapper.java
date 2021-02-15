@@ -19,6 +19,7 @@ public class MediaMuxerCaptureWrapper {
     private MediaEncoder videoEncoder, audioEncoder;
     private long preventAudioPresentationTimeUs = -1;
     private int audioTrackIndex = -1;
+    private int gain = 0;
 
     /**
      * Constructor
@@ -57,6 +58,13 @@ public class MediaMuxerCaptureWrapper {
             audioEncoder.stopRecording();
         }
         audioEncoder = null;
+    }
+
+    public void setGain(int gain) {
+        this.gain = gain;
+        if (audioEncoder instanceof MediaAudioEncoder) {
+            ((MediaAudioEncoder) audioEncoder).setGain(gain);
+        }
     }
 
     public synchronized boolean isStarted() {

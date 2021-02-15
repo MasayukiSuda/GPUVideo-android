@@ -168,7 +168,7 @@ public class AudioMeter extends Thread {
         return 0;
     }
 
-    private short[] shortArrayFromByteBuffer(ByteBuffer buffer) {
+    public short[] shortArrayFromByteBuffer(ByteBuffer buffer) {
         int size = buffer.capacity();
         short[] shortArray = new short[size/2];
         buffer.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shortArray);

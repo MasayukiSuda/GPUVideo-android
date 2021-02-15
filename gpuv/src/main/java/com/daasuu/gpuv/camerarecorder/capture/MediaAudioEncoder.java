@@ -1,10 +1,12 @@
 package com.daasuu.gpuv.camerarecorder.capture;
 
 import android.media.*;
+import android.media.audiofx.NoiseSuppressor;
 import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 
 public class MediaAudioEncoder extends MediaEncoder {
@@ -19,6 +21,9 @@ public class MediaAudioEncoder extends MediaEncoder {
     private AudioThread audioThread = null;
 
     private AudioMeter audioMeter;
+    private float gain = 0.0f;
+    //It goes from 0 to gain
+    private float gradualGain = 0.0f;
 
     public MediaAudioEncoder(final MediaMuxerCaptureWrapper muxer, final MediaEncoderListener listener) {
         super(muxer, listener);
@@ -81,6 +86,10 @@ public class MediaAudioEncoder extends MediaEncoder {
             MediaRecorder.AudioSource.VOICE_RECOGNITION,
     };
 
+    public void setGain(int gain) {
+        this.gain = gain;
+    }
+
     /**
      * Thread to capture audio data from internal mic as uncompressed 16bit PCM data
      * and write them to the MediaCodec encoder
@@ -123,11 +132,36 @@ public class MediaAudioEncoder extends MediaEncoder {
                                     buf.clear();
                                     readBytes = audioRecord.read(buf, SAMPLES_PER_FRAME);
                                     audioMeter.setBuffer(buf);
+
+                                    short[] bufferArray = audioMeter.shortArrayFromByteBuffer(buf);
+
                                     if (readBytes > 0) {
+                                        //Gain activated
+                                        if (gain > 0) {
+
+                                            float currentGain;
+                                            if (audioMeter.getAmplitude() > AudioMeter.AMP_NORMAL_CONVERSATION) {
+                                                gradualGain = gain;
+                                            } else {
+                                                if (gradualGain <= 0) {
+                                                    gradualGain = 0f;
+                                                }else {
+                                                    gradualGain -= 0.05;
+                                                }
+
+                                            }
+                                            currentGain = gain - gradualGain;
+                                            //Log.v("AudioGain", "currentGain " + currentGain);
+
+                                            for (int i = 0; i < bufferArray.length; ++i) {
+                                                bufferArray[i] = (short) Math.min((int) (bufferArray[i] * currentGain), (int) Short.MAX_VALUE);
+                                            }
+                                        }
                                         // set audio data to encoder
                                         buf.position(readBytes);
                                         buf.flip();
-                                        encode(buf, readBytes, getPTSUs());
+                                        encodeShortArray(bufferArray, readBytes, getPTSUs());
+                                        //encode(buf, readBytes, getPTSUs());
                                         frameAvailableSoon();
                                     }
                                 }

@@ -202,6 +202,7 @@ public class EncodeRenderHandler implements Runnable {
                 }
             }
             if (localRequestDraw) {
+                Log.d("MediaRecorder", "localRequestDraw " + requestDraw);
                 if ((egl != null) && texId >= 0) {
                     inputSurface.makeCurrent();
 

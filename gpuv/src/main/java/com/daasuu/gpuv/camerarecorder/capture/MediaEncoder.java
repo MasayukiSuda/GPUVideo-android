@@ -113,6 +113,7 @@ public abstract class MediaEncoder implements Runnable {
         boolean localRequestDrain;
         while (isRunning) {
             synchronized (sync) {
+                Log.d("MediaEncoder", "mRequestDrain "+ requestDrain);
                 localRequestStop = requestStop;
                 localRequestDrain = (requestDrain > 0);
                 if (localRequestDrain)
@@ -239,6 +240,43 @@ public abstract class MediaEncoder implements Runnable {
                 inputBuffer.clear();
                 if (buffer != null) {
                     inputBuffer.put(buffer);
+                }
+
+                if (length <= 0) {
+                    // send EOS
+                    isEOS = true;
+                    Log.i(TAG, "send BUFFER_FLAG_END_OF_STREAM");
+                    mediaCodec.queueInputBuffer(inputBufferIndex, 0, 0,
+                            presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                    break;
+                } else {
+                    mediaCodec.queueInputBuffer(inputBufferIndex, 0, length,
+                            presentationTimeUs, 0);
+                }
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Method to set short array to the MediaCodec encoder
+     *
+     * @param shortBuffer
+     * @param length             　length of byte array, zero means EOS.
+     * @param presentationTimeUs
+     */
+    protected void encodeShortArray(final short[] shortBuffer, final int length, final long presentationTimeUs) {
+        if (!isCapturing) return;
+        while (isCapturing) {
+            final int inputBufferIndex = mediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
+            if (inputBufferIndex >= 0) {
+                final ByteBuffer inputBuffer = mediaCodec.getInputBuffer(inputBufferIndex);
+                inputBuffer.clear();
+                if (shortBuffer != null) {
+                    for(int i = 0; i < shortBuffer.length; i++) {
+                        inputBuffer.putShort(shortBuffer[i]);
+                    }
                 }
 
                 if (length <= 0) {

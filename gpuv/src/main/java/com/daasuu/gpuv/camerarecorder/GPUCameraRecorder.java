@@ -40,6 +40,7 @@ public class GPUCameraRecorder {
     private final boolean isLandscapeDevice;
     private final int degrees;
     private final boolean recordNoFilter;
+    private int gain;
 
     GPUCameraRecorder(
             CameraRecordListener cameraRecordListener,
@@ -76,6 +77,7 @@ public class GPUCameraRecorder {
         this.isLandscapeDevice = isLandscapeDevice;
         this.degrees = degrees;
         this.recordNoFilter = recordNoFilter;
+        this.gain = 0;
 
         // create preview Renderer
         if (null == glPreviewRenderer) {
@@ -99,6 +101,12 @@ public class GPUCameraRecorder {
             fileHeight = size.getHeight();
             fileWidth = size.getWidth();
         }
+    }
+
+    public void setGain(int gain) {
+        this.gain = gain;
+        if (muxer != null)
+            muxer.setGain(gain);
     }
 
     public LensFacing getLensFacing() {
@@ -263,6 +271,7 @@ public class GPUCameraRecorder {
                 try {
                     muxer = new MediaMuxerCaptureWrapper(filePath);
 
+
                     // for video capturing
                     // ここにcamera width , heightもわたす。
                     // 差分をいろいろと吸収する。
@@ -282,6 +291,8 @@ public class GPUCameraRecorder {
                         // for audio capturing
                         new MediaAudioEncoder(muxer, mediaEncoderListener);
                     }
+                    muxer.setGain(gain);
+
                     muxer.prepare();
                     muxer.startRecording();
 
