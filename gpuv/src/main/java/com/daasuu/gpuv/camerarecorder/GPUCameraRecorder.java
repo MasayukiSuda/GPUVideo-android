@@ -40,7 +40,9 @@ public class GPUCameraRecorder {
     private final boolean isLandscapeDevice;
     private final int degrees;
     private final boolean recordNoFilter;
-    private int gain;
+    private int gain = 0;
+    private int dropGainThreshold = 0;
+    private boolean noiseSupressor = false;
 
     GPUCameraRecorder(
             CameraRecordListener cameraRecordListener,
@@ -77,7 +79,6 @@ public class GPUCameraRecorder {
         this.isLandscapeDevice = isLandscapeDevice;
         this.degrees = degrees;
         this.recordNoFilter = recordNoFilter;
-        this.gain = 0;
 
         // create preview Renderer
         if (null == glPreviewRenderer) {
@@ -107,6 +108,18 @@ public class GPUCameraRecorder {
         this.gain = gain;
         if (muxer != null)
             muxer.setGain(gain);
+    }
+
+    public void setDropGainThreshold(int dropGainThreshold) {
+        this.dropGainThreshold = dropGainThreshold;
+        if (muxer != null)
+            muxer.setDropGainThreshold(dropGainThreshold);
+    }
+
+    public void setNoiseSupressor(boolean noiseSupressor) {
+        this.noiseSupressor = noiseSupressor;
+        if (muxer != null)
+            muxer.setNoiseSupressor(noiseSupressor);
     }
 
     public LensFacing getLensFacing() {
@@ -292,6 +305,8 @@ public class GPUCameraRecorder {
                         new MediaAudioEncoder(muxer, mediaEncoderListener);
                     }
                     muxer.setGain(gain);
+                    muxer.setDropGainThreshold(dropGainThreshold);
+                    muxer.setNoiseSupressor(noiseSupressor);
 
                     muxer.prepare();
                     muxer.startRecording();

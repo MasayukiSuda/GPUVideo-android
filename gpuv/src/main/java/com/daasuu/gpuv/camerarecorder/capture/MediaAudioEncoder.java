@@ -25,6 +25,10 @@ public class MediaAudioEncoder extends MediaEncoder {
     //It goes from 0 to gain
     private float gradualGain = 0.0f;
 
+    private float dropGainThreshold = 0.0f;
+
+    private boolean noiseSupressor = false;
+
     public MediaAudioEncoder(final MediaMuxerCaptureWrapper muxer, final MediaEncoderListener listener) {
         super(muxer, listener);
         audioMeter = AudioMeter.getInstance();
@@ -90,6 +94,14 @@ public class MediaAudioEncoder extends MediaEncoder {
         this.gain = gain;
     }
 
+    public void setDropGainThreshold(float dropGainThreshold) {
+        this.dropGainThreshold = dropGainThreshold;
+    }
+
+    public void setNoiseSupressor(boolean noiseSupressor) {
+        this.noiseSupressor = noiseSupressor;
+    }
+
     /**
      * Thread to capture audio data from internal mic as uncompressed 16bit PCM data
      * and write them to the MediaCodec encoder
@@ -114,6 +126,12 @@ public class MediaAudioEncoder extends MediaEncoder {
                                 AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
                         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
                             audioRecord = null;
+                        if (noiseSupressor) {
+                            NoiseSuppressor noiseSuppressor = NoiseSuppressor.create(audioRecord.getAudioSessionId());
+                            if (noiseSuppressor != null) {
+                                noiseSuppressor.setEnabled(true);
+                            }
+                        }
                     } catch (final Exception e) {
                         audioRecord = null;
                     }
@@ -140,13 +158,14 @@ public class MediaAudioEncoder extends MediaEncoder {
                                         if (gain > 0) {
 
                                             float currentGain;
-                                            if (audioMeter.getAmplitude() > AudioMeter.AMP_NORMAL_CONVERSATION) {
-                                                gradualGain = gain;
+
+                                            if (audioMeter.getAmplitude() > dropGainThreshold) {//AudioMeter.AudioMeterAMP.AMP_HAIR_DRYER.value) {
+                                                gradualGain = (gain >= 2) ? (gain - 2) : gain; // we do this because gain 2 is the minimum gain we want
                                             } else {
                                                 if (gradualGain <= 0) {
                                                     gradualGain = 0f;
                                                 }else {
-                                                    gradualGain -= 0.05;
+                                                    gradualGain -= 0.02;
                                                 }
 
                                             }

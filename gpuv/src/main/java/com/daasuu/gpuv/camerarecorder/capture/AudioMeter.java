@@ -12,16 +12,23 @@ public class AudioMeter extends Thread {
     /////////////////////////////////////////////////////////////////
     // PUBLIC CONSTANTS
 
-    // Convenience constants
-    public static final int AMP_SILENCE = 0;
-    public static final int AMP_NORMAL_BREATHING = 10;
-    public static final int AMP_MOSQUITO = 20;
-    public static final int AMP_WHISPER = 30;
-    public static final int AMP_STREAM = 40;
-    public static final int AMP_QUIET_OFFICE = 50;
-    public static final int AMP_NORMAL_CONVERSATION = 60;
-    public static final int AMP_HAIR_DRYER = 70;
-    public static final int AMP_GARBAGE_DISPOSAL = 80;
+
+    public enum AudioMeterAMP {
+        AMP_SILENCE(0),
+        AMP_NORMAL_BREATHING(10),
+        AMP_MOSQUITO(20),
+        AMP_WHISPER(30),
+        AMP_STREAM(40),
+        AMP_QUIET_OFFICE(50),
+        AMP_NORMAL_CONVERSATION(60),
+        AMP_HAIR_DRYER(70),
+        AMP_GARBAGE_DISPOSAL(80);
+
+        final int value;
+        private AudioMeterAMP(int value) {
+            this.value = value;
+        }
+    }
 
     /////////////////////////////////////////////////////////////////
     // PRIVATE CONSTANTS
