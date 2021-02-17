@@ -1,6 +1,7 @@
 package com.daasuu.gpuv.camerarecorder.capture;
 
 import android.media.*;
+import android.media.audiofx.LoudnessEnhancer;
 import android.media.audiofx.NoiseSuppressor;
 import android.util.Log;
 
@@ -160,17 +161,21 @@ public class MediaAudioEncoder extends MediaEncoder {
                                             float currentGain;
 
                                             if (audioMeter.getAmplitude() > dropGainThreshold) {//AudioMeter.AudioMeterAMP.AMP_HAIR_DRYER.value) {
-                                                gradualGain = (gain >= 2) ? (gain - 2) : gain; // we do this because gain 2 is the minimum gain we want
+                                                //gradualGain = (gain >= 2) ? (gain - 2) : gain; // we do this because gain 2 is the minimum gain we want
+                                                gradualGain += 0.05;
+                                                if (gradualGain >= gain) {
+                                                    gradualGain = gain;
+                                                }
                                             } else {
                                                 if (gradualGain <= 0) {
                                                     gradualGain = 0f;
                                                 }else {
-                                                    gradualGain -= 0.02;
+                                                    gradualGain -= 0.01;
                                                 }
 
                                             }
                                             currentGain = gain - gradualGain;
-                                            //Log.v("AudioGain", "currentGain " + currentGain);
+                                            Log.v("AudioGain", "currentGain " + currentGain);
 
                                             for (int i = 0; i < bufferArray.length; ++i) {
                                                 bufferArray[i] = (short) Math.min((int) (bufferArray[i] * currentGain), (int) Short.MAX_VALUE);
