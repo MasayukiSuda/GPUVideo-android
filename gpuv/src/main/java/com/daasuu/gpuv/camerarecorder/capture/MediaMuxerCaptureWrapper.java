@@ -22,6 +22,7 @@ public class MediaMuxerCaptureWrapper {
     private int gain = 0;
     private int dropGainThreshold = 0;
     private boolean noiseSupressor = false;
+    private float dropGainPerSample = 0.0f;
 
     /**
      * Constructor
@@ -80,6 +81,13 @@ public class MediaMuxerCaptureWrapper {
         this.noiseSupressor = noiseSupressor;
         if (audioEncoder instanceof MediaAudioEncoder) {
             ((MediaAudioEncoder) audioEncoder).setNoiseSupressor(noiseSupressor);
+        }
+    }
+
+    public void setDropGainPerSample(float dropGainPerSample) {
+        this.dropGainPerSample = dropGainPerSample;
+        if (audioEncoder instanceof MediaAudioEncoder) {
+            ((MediaAudioEncoder) audioEncoder).setDropGainPerSample(dropGainPerSample);
         }
     }
 

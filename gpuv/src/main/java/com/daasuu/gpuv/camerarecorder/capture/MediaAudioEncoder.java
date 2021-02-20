@@ -30,6 +30,8 @@ public class MediaAudioEncoder extends MediaEncoder {
 
     private boolean noiseSupressor = false;
 
+    private float dropGainPerSample = 0.5f;
+
     public MediaAudioEncoder(final MediaMuxerCaptureWrapper muxer, final MediaEncoderListener listener) {
         super(muxer, listener);
         audioMeter = AudioMeter.getInstance();
@@ -103,6 +105,10 @@ public class MediaAudioEncoder extends MediaEncoder {
         this.noiseSupressor = noiseSupressor;
     }
 
+    public void setDropGainPerSample(float dropGainPerSample) {
+        this.dropGainPerSample = dropGainPerSample;
+    }
+
     /**
      * Thread to capture audio data from internal mic as uncompressed 16bit PCM data
      * and write them to the MediaCodec encoder
@@ -162,15 +168,15 @@ public class MediaAudioEncoder extends MediaEncoder {
 
                                             if (audioMeter.getAmplitude() > dropGainThreshold) {//AudioMeter.AudioMeterAMP.AMP_HAIR_DRYER.value) {
                                                 //gradualGain = (gain >= 2) ? (gain - 2) : gain; // we do this because gain 2 is the minimum gain we want
-                                                gradualGain += 0.05;
-                                                if (gradualGain >= gain) {
-                                                    gradualGain = gain;
+                                                gradualGain += dropGainPerSample;
+                                                if (gradualGain >= (gain - 2)) {
+                                                    gradualGain = gain - 2;
                                                 }
                                             } else {
                                                 if (gradualGain <= 0) {
                                                     gradualGain = 0f;
                                                 }else {
-                                                    gradualGain -= 0.01;
+                                                    gradualGain -= 0.1;
                                                 }
 
                                             }

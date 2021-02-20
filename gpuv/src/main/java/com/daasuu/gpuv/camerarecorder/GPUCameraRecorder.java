@@ -43,6 +43,7 @@ public class GPUCameraRecorder {
     private int gain = 0;
     private int dropGainThreshold = 0;
     private boolean noiseSupressor = false;
+    private float dropGainPerSample = 0.0f;
 
     GPUCameraRecorder(
             CameraRecordListener cameraRecordListener,
@@ -120,6 +121,12 @@ public class GPUCameraRecorder {
         this.noiseSupressor = noiseSupressor;
         if (muxer != null)
             muxer.setNoiseSupressor(noiseSupressor);
+    }
+
+    public void setDropGainPerSample(float dropGainPerSample) {
+        this.dropGainPerSample = dropGainPerSample;
+        if (muxer != null)
+            muxer.setDropGainPerSample(dropGainPerSample);
     }
 
     public LensFacing getLensFacing() {
@@ -307,6 +314,7 @@ public class GPUCameraRecorder {
                     muxer.setGain(gain);
                     muxer.setDropGainThreshold(dropGainThreshold);
                     muxer.setNoiseSupressor(noiseSupressor);
+                    muxer.setDropGainPerSample(dropGainPerSample);
 
                     muxer.prepare();
                     muxer.startRecording();
