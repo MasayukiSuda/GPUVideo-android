@@ -132,6 +132,10 @@ public class MediaVideoEncoder extends MediaEncoder {
         return bitrate;
     }
 
+    public boolean isReduceFps() {
+        return encodeRenderHandler != null && encodeRenderHandler.isLocalRequestDrawBusy();
+    }
+
     /**
      * select the first codec that match a specific MIME type
      *

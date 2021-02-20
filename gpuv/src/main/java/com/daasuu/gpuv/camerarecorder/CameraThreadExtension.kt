@@ -22,7 +22,7 @@ class CameraThreadExtension  {
             for (range in ranges!!) {
                 val upper: Int = range?.upper!!
 
-                if (upper >= 30) {
+                if (upper >= 20) {
                     if (result == null || upper < result.upper) {
                         result = range
                     }

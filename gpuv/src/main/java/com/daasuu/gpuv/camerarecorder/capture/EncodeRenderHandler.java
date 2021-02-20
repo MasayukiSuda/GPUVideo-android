@@ -18,6 +18,8 @@ import static android.opengl.GLES20.*;
 public class EncodeRenderHandler implements Runnable {
     private static final String TAG = "GPUCameraRecorder";
 
+    private static final int BUFFER_FULL_THREASHOLD = 3;
+
     private final Object sync = new Object();
     private EGLContext sharedContext;
     private boolean isRecordable;
@@ -178,10 +180,13 @@ public class EncodeRenderHandler implements Runnable {
     //********************************************************************************
 //********************************************************************************
 
+    public boolean isLocalRequestDrawBusy() {
+        return requestDraw > BUFFER_FULL_THREASHOLD;
+    }
 
     @Override
     public final void run() {
-        Log.i(TAG, "EncodeRenderHandler thread started:");
+        //Log.i(TAG, "EncodeRenderHandler thread started:");
         synchronized (sync) {
             requestSetEglContext = requestRelease = false;
             requestDraw = 0;
@@ -202,7 +207,7 @@ public class EncodeRenderHandler implements Runnable {
                 }
             }
             if (localRequestDraw) {
-                //Log.d("MediaRecorder", "localRequestDraw " + requestDraw);
+                Log.d("MediaRecorder", "localRequestDraw " + requestDraw);
                 if ((egl != null) && texId >= 0) {
                     inputSurface.makeCurrent();
 
