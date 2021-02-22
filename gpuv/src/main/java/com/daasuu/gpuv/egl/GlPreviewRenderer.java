@@ -247,6 +247,9 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
             glFilter.draw(filterFramebufferObject.getTexName(), fbo);
         }
 
+        //Rotate image to avoid mirrored image
+        Matrix.scaleM(MVPMatrix, 0, 1, -1, 1);
+
         if (videoEncoder != null && !videoEncoder.isReduceFps()) {
             flip = false;
             synchronized (this) {
