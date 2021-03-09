@@ -111,6 +111,10 @@ public class GPUCameraRecorder {
             muxer.setGain(gain);
     }
 
+    public int getGain() {
+        return gain;
+    }
+
     public void setDropGainThreshold(int dropGainThreshold) {
         this.dropGainThreshold = dropGainThreshold;
         if (muxer != null)

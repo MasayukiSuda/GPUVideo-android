@@ -107,8 +107,8 @@ public class EncodeRenderHandler implements Runnable {
                 YMatrixScale = (flipVertical ? -1 : 1) * (viewAspect / fileAspect);
                 Log.v(TAG, "cameraAspect: " + viewAspect + " YMatrixScale :" + YMatrixScale);
             } else {
-                XMatrixScale = (flipHorizontal ? -1 : 1) * (fileAspect / viewAspect);
-                YMatrixScale = (flipVertical ? -1 : 1);
+                XMatrixScale = (flipHorizontal ? -1 : 1);//(flipHorizontal ? -1 : 1) * (fileAspect / viewAspect);
+                YMatrixScale = (flipVertical ? -1 : 1) * (fileAspect / viewAspect);//(flipVertical ? -1 : 1);
                 Log.v(TAG, "cameraAspect: " + viewAspect + " YMatrixScale :" + YMatrixScale + " XMatrixScale :" + XMatrixScale);
             }
         }
@@ -152,11 +152,11 @@ public class EncodeRenderHandler implements Runnable {
             System.arraycopy(texMatrix, 0, STMatrix, 0, 16);
             System.arraycopy(mvpMatrix, 0, MVPMatrix, 0, 16);
             // square対策
-            /*Matrix.scaleM(MVPMatrix,
+            Matrix.scaleM(MVPMatrix,
                     0,
                     XMatrixScale, // ここをマイナスの値にするとflipする //If this is set to a negative value, it will flip
                     YMatrixScale, // 見た目との歪みもここで調整すればいけると思う。// I think that the distortion with the appearance should be adjusted here.
-                    1);*/
+                    1);
             this.aspectRatio = aspectRatio;
             requestDraw++;
             sync.notifyAll();

@@ -45,7 +45,7 @@ public class MediaVideoEncoder extends MediaEncoder {
                 TAG,
                 flipVertical,
                 flipHorizontal,
-                (viewWidth > viewHeight) ? (viewWidth / viewHeight) : (viewHeight / viewWidth),
+                (viewHeight / viewWidth),
                 fileWidth,
                 fileHeight,
                 recordNoFilter,
