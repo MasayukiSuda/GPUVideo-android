@@ -64,6 +64,7 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
         this.glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
 
+
         Matrix.setIdentityM(STMatrix, 0);
     }
 
@@ -78,7 +79,6 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
 //        Log.d("GPUCameraRecorder ", "cameraPreviewWidth " + cameraPreviewWidth);
 //        Log.d("GPUCameraRecorder ", "cameraPreviewHeight " + cameraPreviewHeight);
 
-        isLandscapeDevice = false;
 
         if (isLandscapeDevice) {
 
@@ -246,9 +246,6 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
             GLES20.glClear(GL_COLOR_BUFFER_BIT);
             glFilter.draw(filterFramebufferObject.getTexName(), fbo);
         }
-
-        //Rotate image to avoid mirrored image
-        Matrix.scaleM(MVPMatrix, 0, 1, -1, 1);
 
         if (videoEncoder != null && !videoEncoder.isReduceFps()) {
             flip = false;
