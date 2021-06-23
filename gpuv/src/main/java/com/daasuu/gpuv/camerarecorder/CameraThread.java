@@ -280,6 +280,8 @@ public class CameraThread extends Thread {
             cameraCaptureSession.setRepeatingRequest(requestBuilder.build(), null, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
         }
 
         requestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);

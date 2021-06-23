@@ -20,7 +20,7 @@ public class MediaVideoEncoder extends MediaEncoder {
     private static final String MIME_TYPE = "video/avc";
     // parameters for recording
     private static final int FRAME_RATE = 30;
-    private static final float BPP = 0.25f;
+    private static final float BPP = 0.1f;
 
     private final int fileWidth;
     private final int fileHeight;
