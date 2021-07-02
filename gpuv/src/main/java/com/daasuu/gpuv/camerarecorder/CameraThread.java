@@ -213,6 +213,7 @@ public class CameraThread extends Thread {
             requestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            return;
         }
 
         requestBuilder.addTarget(surface);
@@ -220,6 +221,7 @@ public class CameraThread extends Thread {
             cameraDevice.createCaptureSession(Collections.singletonList(surface), cameraCaptureSessionCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            return;
         }
 
         cameraRecordListener.onCameraThreadStarted();
@@ -292,6 +294,8 @@ public class CameraThread extends Thread {
         try {
             cameraCaptureSession.setRepeatingRequest(requestBuilder.build(), null, null);
         } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }catch (IllegalStateException e) {
             e.printStackTrace();
         }
 
