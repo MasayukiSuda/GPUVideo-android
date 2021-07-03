@@ -18,6 +18,8 @@ import static android.opengl.GLES20.*;
 public class EncodeRenderHandler implements Runnable {
     private static final String TAG = "GPUCameraRecorder";
 
+    private static final int BUFFER_FULL_THREASHOLD = 3;
+
     private final Object sync = new Object();
     private EGLContext sharedContext;
     private boolean isRecordable;
@@ -105,8 +107,8 @@ public class EncodeRenderHandler implements Runnable {
                 YMatrixScale = (flipVertical ? -1 : 1) * (viewAspect / fileAspect);
                 Log.v(TAG, "cameraAspect: " + viewAspect + " YMatrixScale :" + YMatrixScale);
             } else {
-                XMatrixScale = (flipHorizontal ? -1 : 1) * (fileAspect / viewAspect);
-                YMatrixScale = (flipVertical ? -1 : 1);
+                XMatrixScale = (flipHorizontal ? -1 : 1);//(flipHorizontal ? -1 : 1) * (fileAspect / viewAspect);
+                YMatrixScale = (flipVertical ? -1 : 1) * (fileAspect / viewAspect);//(flipVertical ? -1 : 1);
                 Log.v(TAG, "cameraAspect: " + viewAspect + " YMatrixScale :" + YMatrixScale + " XMatrixScale :" + XMatrixScale);
             }
         }
@@ -152,8 +154,8 @@ public class EncodeRenderHandler implements Runnable {
             // square対策
             Matrix.scaleM(MVPMatrix,
                     0,
-                    XMatrixScale, // ここをマイナスの値にするとflipする
-                    YMatrixScale, // 見た目との歪みもここで調整すればいけると思う。
+                    XMatrixScale, // ここをマイナスの値にするとflipする //If this is set to a negative value, it will flip
+                    YMatrixScale, // 見た目との歪みもここで調整すればいけると思う。// I think that the distortion with the appearance should be adjusted here.
                     1);
             this.aspectRatio = aspectRatio;
             requestDraw++;
@@ -178,10 +180,13 @@ public class EncodeRenderHandler implements Runnable {
     //********************************************************************************
 //********************************************************************************
 
+    public boolean isLocalRequestDrawBusy() {
+        return requestDraw > BUFFER_FULL_THREASHOLD;
+    }
 
     @Override
     public final void run() {
-        Log.i(TAG, "EncodeRenderHandler thread started:");
+        //Log.i(TAG, "EncodeRenderHandler thread started:");
         synchronized (sync) {
             requestSetEglContext = requestRelease = false;
             requestDraw = 0;
@@ -202,6 +207,7 @@ public class EncodeRenderHandler implements Runnable {
                 }
             }
             if (localRequestDraw) {
+                Log.d("MediaRecorder", "localRequestDraw " + requestDraw);
                 if ((egl != null) && texId >= 0) {
                     inputSurface.makeCurrent();
 

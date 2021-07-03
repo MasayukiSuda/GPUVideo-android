@@ -42,6 +42,7 @@ public class CameraThread extends Thread {
     private final OnStartPreviewListener listener;
     private final CameraRecordListener cameraRecordListener;
     private final CameraManager cameraManager;
+    private String cameraId;
 
     private Size cameraSize;
     private boolean isFlashTorch = false;
@@ -63,6 +64,7 @@ public class CameraThread extends Thread {
         this.surfaceTexture = surfaceTexture;
         this.cameraManager = cameraManager;
         this.lensFacing = lensFacing;
+        this.cameraId = null;
 
     }
 
@@ -121,7 +123,9 @@ public class CameraThread extends Thread {
         HandlerThread thread = new HandlerThread("CameraPreview");
         thread.start();
         Handler backgroundHandler = new Handler(thread.getLooper());
-
+        requestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+        requestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, CameraThreadExtension.getRange(cameraManager, cameraId));//This line of code is used for adjusting the fps range and fixing the dark preview
+        requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false);
         try {
             cameraCaptureSession.setRepeatingRequest(requestBuilder.build(), null, backgroundHandler);
         } catch (CameraAccessException e) {
@@ -189,7 +193,7 @@ public class CameraThread extends Thread {
                     HandlerThread thread = new HandlerThread("OpenCamera");
                     thread.start();
                     Handler backgroundHandler = new Handler(thread.getLooper());
-
+                    this.cameraId = cameraId;
                     cameraManager.openCamera(cameraId, cameraDeviceCallback, backgroundHandler);
 
                     return;
@@ -209,6 +213,7 @@ public class CameraThread extends Thread {
             requestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            return;
         }
 
         requestBuilder.addTarget(surface);
@@ -216,8 +221,10 @@ public class CameraThread extends Thread {
             cameraDevice.createCaptureSession(Collections.singletonList(surface), cameraCaptureSessionCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            return;
         }
 
+        cameraRecordListener.onCameraThreadStarted();
         listener.onStart(cameraSize, flashSupport);
 
     }
@@ -260,7 +267,7 @@ public class CameraThread extends Thread {
      * change focus
      */
     void changeManualFocusPoint(float eventX, float eventY, int viewWidth, int viewHeight) {
-
+        if (cameraCaptureSession == null) return;
         final int y = (int) ((eventX / (float) viewWidth) * (float) sensorArraySize.height());
         final int x = (int) ((eventY / (float) viewHeight) * (float) sensorArraySize.width());
         final int halfTouchWidth = 400;
@@ -275,6 +282,8 @@ public class CameraThread extends Thread {
             cameraCaptureSession.setRepeatingRequest(requestBuilder.build(), null, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
         }
 
         requestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
@@ -285,6 +294,8 @@ public class CameraThread extends Thread {
         try {
             cameraCaptureSession.setRepeatingRequest(requestBuilder.build(), null, null);
         } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }catch (IllegalStateException e) {
             e.printStackTrace();
         }
 

@@ -1,10 +1,13 @@
 package com.daasuu.gpuv.camerarecorder.capture;
 
 import android.media.*;
+import android.media.audiofx.LoudnessEnhancer;
+import android.media.audiofx.NoiseSuppressor;
 import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 
 public class MediaAudioEncoder extends MediaEncoder {
@@ -18,8 +21,20 @@ public class MediaAudioEncoder extends MediaEncoder {
 
     private AudioThread audioThread = null;
 
+    private AudioMeter audioMeter;
+    private float gain = 0.0f;
+    //It goes from 0 to gain
+    private float gradualGain = 0.0f;
+
+    private float dropGainThreshold = 0.0f;
+
+    private boolean noiseSupressor = false;
+
+    private float dropGainPerSample = 0.5f;
+
     public MediaAudioEncoder(final MediaMuxerCaptureWrapper muxer, final MediaEncoderListener listener) {
         super(muxer, listener);
+        audioMeter = AudioMeter.getInstance();
     }
 
     @Override
@@ -37,9 +52,9 @@ public class MediaAudioEncoder extends MediaEncoder {
 
         final MediaFormat audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1);
         audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);
+        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_STEREO);
         audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
-        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
+        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 2);
         Log.i(TAG, "format: " + audioFormat);
         mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE);
         mediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
@@ -78,6 +93,22 @@ public class MediaAudioEncoder extends MediaEncoder {
             MediaRecorder.AudioSource.VOICE_RECOGNITION,
     };
 
+    public void setGain(int gain) {
+        this.gain = gain;
+    }
+
+    public void setDropGainThreshold(float dropGainThreshold) {
+        this.dropGainThreshold = dropGainThreshold;
+    }
+
+    public void setNoiseSupressor(boolean noiseSupressor) {
+        this.noiseSupressor = noiseSupressor;
+    }
+
+    public void setDropGainPerSample(float dropGainPerSample) {
+        this.dropGainPerSample = dropGainPerSample;
+    }
+
     /**
      * Thread to capture audio data from internal mic as uncompressed 16bit PCM data
      * and write them to the MediaCodec encoder
@@ -88,7 +119,7 @@ public class MediaAudioEncoder extends MediaEncoder {
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
             try {
                 final int min_buffer_size = AudioRecord.getMinBufferSize(
-                        SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+                        SAMPLE_RATE, AudioFormat.CHANNEL_IN_STEREO,
                         AudioFormat.ENCODING_PCM_16BIT);
                 int buffer_size = SAMPLES_PER_FRAME * FRAMES_PER_BUFFER;
                 if (buffer_size < min_buffer_size)
@@ -99,9 +130,15 @@ public class MediaAudioEncoder extends MediaEncoder {
                     try {
                         audioRecord = new AudioRecord(
                                 source, SAMPLE_RATE,
-                                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
+                                AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
                         if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED)
                             audioRecord = null;
+                        if (noiseSupressor) {
+                            NoiseSuppressor noiseSuppressor = NoiseSuppressor.create(audioRecord.getAudioSessionId());
+                            if (noiseSuppressor != null) {
+                                noiseSuppressor.setEnabled(true);
+                            }
+                        }
                     } catch (final Exception e) {
                         audioRecord = null;
                     }
@@ -119,11 +156,42 @@ public class MediaAudioEncoder extends MediaEncoder {
                                     // read audio data from internal mic
                                     buf.clear();
                                     readBytes = audioRecord.read(buf, SAMPLES_PER_FRAME);
+                                    audioMeter.setBuffer(buf);
+
+                                    short[] bufferArray = audioMeter.shortArrayFromByteBuffer(buf);
+
                                     if (readBytes > 0) {
+                                        //Gain activated
+                                        if (gain > 0) {
+
+                                            float currentGain;
+
+                                            if (audioMeter.getAmplitude() > dropGainThreshold) {//AudioMeter.AudioMeterAMP.AMP_HAIR_DRYER.value) {
+                                                //gradualGain = (gain >= 2) ? (gain - 2) : gain; // we do this because gain 2 is the minimum gain we want
+                                                gradualGain += dropGainPerSample;
+                                                if (gradualGain >= (gain - 2)) {
+                                                    gradualGain = gain - 2;
+                                                }
+                                            } else {
+                                                if (gradualGain <= 0) {
+                                                    gradualGain = 0f;
+                                                }else {
+                                                    gradualGain -= 0.1;
+                                                }
+
+                                            }
+                                            currentGain = gain - gradualGain;
+                                            Log.v("AudioGain", "currentGain " + currentGain);
+
+                                            for (int i = 0; i < bufferArray.length; ++i) {
+                                                bufferArray[i] = (short) Math.min((int) (bufferArray[i] * currentGain), (int) Short.MAX_VALUE);
+                                            }
+                                        }
                                         // set audio data to encoder
                                         buf.position(readBytes);
                                         buf.flip();
-                                        encode(buf, readBytes, getPTSUs());
+                                        encodeShortArray(bufferArray, readBytes, getPTSUs());
+                                        //encode(buf, readBytes, getPTSUs());
                                         frameAvailableSoon();
                                     }
                                 }

@@ -20,7 +20,7 @@ public class MediaVideoEncoder extends MediaEncoder {
     private static final String MIME_TYPE = "video/avc";
     // parameters for recording
     private static final int FRAME_RATE = 30;
-    private static final float BPP = 0.25f;
+    private static final float BPP = 0.1f;
 
     private final int fileWidth;
     private final int fileHeight;
@@ -45,7 +45,7 @@ public class MediaVideoEncoder extends MediaEncoder {
                 TAG,
                 flipVertical,
                 flipHorizontal,
-                (viewWidth > viewHeight) ? (viewWidth / viewHeight) : (viewHeight / viewWidth),
+                (viewHeight / viewWidth),
                 fileWidth,
                 fileHeight,
                 recordNoFilter,
@@ -130,6 +130,10 @@ public class MediaVideoEncoder extends MediaEncoder {
         final int bitrate = (int) (BPP * FRAME_RATE * width * height);
         Log.i(TAG, "bitrate=" + bitrate);
         return bitrate;
+    }
+
+    public boolean isReduceFps() {
+        return encodeRenderHandler != null && encodeRenderHandler.isLocalRequestDrawBusy();
     }
 
     /**

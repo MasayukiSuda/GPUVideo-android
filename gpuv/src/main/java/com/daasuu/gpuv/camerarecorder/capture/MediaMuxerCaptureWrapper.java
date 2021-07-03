@@ -19,6 +19,10 @@ public class MediaMuxerCaptureWrapper {
     private MediaEncoder videoEncoder, audioEncoder;
     private long preventAudioPresentationTimeUs = -1;
     private int audioTrackIndex = -1;
+    private int gain = 0;
+    private int dropGainThreshold = 0;
+    private boolean noiseSupressor = false;
+    private float dropGainPerSample = 0.0f;
 
     /**
      * Constructor
@@ -57,6 +61,34 @@ public class MediaMuxerCaptureWrapper {
             audioEncoder.stopRecording();
         }
         audioEncoder = null;
+    }
+
+    public void setGain(int gain) {
+        this.gain = gain;
+        if (audioEncoder instanceof MediaAudioEncoder) {
+            ((MediaAudioEncoder) audioEncoder).setGain(gain);
+        }
+    }
+
+    public void setDropGainThreshold(int dropGainThreshold) {
+        this.dropGainThreshold = dropGainThreshold;
+        if (audioEncoder instanceof MediaAudioEncoder) {
+            ((MediaAudioEncoder) audioEncoder).setDropGainThreshold(dropGainThreshold);
+        }
+    }
+
+    public void setNoiseSupressor(boolean noiseSupressor) {
+        this.noiseSupressor = noiseSupressor;
+        if (audioEncoder instanceof MediaAudioEncoder) {
+            ((MediaAudioEncoder) audioEncoder).setNoiseSupressor(noiseSupressor);
+        }
+    }
+
+    public void setDropGainPerSample(float dropGainPerSample) {
+        this.dropGainPerSample = dropGainPerSample;
+        if (audioEncoder instanceof MediaAudioEncoder) {
+            ((MediaAudioEncoder) audioEncoder).setDropGainPerSample(dropGainPerSample);
+        }
     }
 
     public synchronized boolean isStarted() {

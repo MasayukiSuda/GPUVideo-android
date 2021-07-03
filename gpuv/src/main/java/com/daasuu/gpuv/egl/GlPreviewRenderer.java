@@ -54,6 +54,7 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
     private SurfaceCreateListener surfaceCreateListener;
     private MediaVideoEncoder videoEncoder;
 
+    private boolean flip = false;
 
     public GlPreviewRenderer(GLSurfaceView glView) {
         this.glView = glView;
@@ -61,6 +62,7 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
         this.glView.setEGLContextFactory(new GlContextFactory());
         this.glView.setRenderer(this);
         this.glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
 
 
         Matrix.setIdentityM(STMatrix, 0);
@@ -245,13 +247,23 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
             glFilter.draw(filterFramebufferObject.getTexName(), fbo);
         }
 
-        synchronized (this) {
-            if (videoEncoder != null) {
+        if (videoEncoder != null && !videoEncoder.isReduceFps()) {
+            flip = false;
+            synchronized (this) {
                 // notify to capturing thread that the camera frame is available.
                 videoEncoder.frameAvailableSoon(texName, STMatrix, MVPMatrix, aspectRatio);
             }
+        } else {
+            flip = !flip;
+            if (flip) {
+                synchronized (this) {
+                    if (videoEncoder != null) {
+                        // notify to capturing thread that the camera frame is available.
+                        videoEncoder.frameAvailableSoon(texName, STMatrix, MVPMatrix, aspectRatio);
+                    }
+                }
+            }
         }
-
     }
 
     public void setCameraResolution(Size cameraResolution) {

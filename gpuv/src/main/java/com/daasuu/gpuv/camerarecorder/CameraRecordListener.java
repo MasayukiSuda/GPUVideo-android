@@ -15,9 +15,12 @@ public interface CameraRecordListener {
     void onError(Exception exception);
 
     void onCameraThreadFinish();
+    void onCameraThreadStarted();
 
     /**
      * Is called when native codecs finish to write file.
      */
     void onVideoFileReady();
+
+
 }

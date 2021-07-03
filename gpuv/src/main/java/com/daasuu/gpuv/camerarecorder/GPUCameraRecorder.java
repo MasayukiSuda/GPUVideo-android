@@ -27,8 +27,8 @@ public class GPUCameraRecorder {
     private boolean flashSupport = false;
 
     private MediaMuxerCaptureWrapper muxer;
-    private final int fileWidth;
-    private final int fileHeight;
+    private int fileWidth;
+    private int fileHeight;
 
     private final int cameraWidth;
     private final int cameraHeight;
@@ -40,6 +40,10 @@ public class GPUCameraRecorder {
     private final boolean isLandscapeDevice;
     private final int degrees;
     private final boolean recordNoFilter;
+    private int gain = 0;
+    private int dropGainThreshold = 0;
+    private boolean noiseSupressor = false;
+    private float dropGainPerSample = 0.0f;
 
     GPUCameraRecorder(
             CameraRecordListener cameraRecordListener,
@@ -90,6 +94,48 @@ public class GPUCameraRecorder {
         });
     }
 
+    public Size getFileSize() {
+        return new Size(fileWidth, fileHeight);
+    }
+
+    public void setFileSize(Size size) {
+        if (!isStarted()) {
+            fileHeight = size.getHeight();
+            fileWidth = size.getWidth();
+        }
+    }
+
+    public void setGain(int gain) {
+        this.gain = gain;
+        if (muxer != null)
+            muxer.setGain(gain);
+    }
+
+    public int getGain() {
+        return gain;
+    }
+
+    public void setDropGainThreshold(int dropGainThreshold) {
+        this.dropGainThreshold = dropGainThreshold;
+        if (muxer != null)
+            muxer.setDropGainThreshold(dropGainThreshold);
+    }
+
+    public void setNoiseSupressor(boolean noiseSupressor) {
+        this.noiseSupressor = noiseSupressor;
+        if (muxer != null)
+            muxer.setNoiseSupressor(noiseSupressor);
+    }
+
+    public void setDropGainPerSample(float dropGainPerSample) {
+        this.dropGainPerSample = dropGainPerSample;
+        if (muxer != null)
+            muxer.setDropGainPerSample(dropGainPerSample);
+    }
+
+    public LensFacing getLensFacing() {
+        return lensFacing;
+    }
 
     private synchronized void startPreview(SurfaceTexture surfaceTexture) {
         if (cameraHandler == null) {
@@ -249,6 +295,7 @@ public class GPUCameraRecorder {
                 try {
                     muxer = new MediaMuxerCaptureWrapper(filePath);
 
+
                     // for video capturing
                     // ここにcamera width , heightもわたす。
                     // 差分をいろいろと吸収する。
@@ -268,6 +315,11 @@ public class GPUCameraRecorder {
                         // for audio capturing
                         new MediaAudioEncoder(muxer, mediaEncoderListener);
                     }
+                    muxer.setGain(gain);
+                    muxer.setDropGainThreshold(dropGainThreshold);
+                    muxer.setNoiseSupressor(noiseSupressor);
+                    muxer.setDropGainPerSample(dropGainPerSample);
+
                     muxer.prepare();
                     muxer.startRecording();
 
