@@ -4,31 +4,29 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.daasuu.gpuv.egl.filter.GlFilter;
 import com.daasuu.gpuv.player.GPUPlayerView;
 import com.daasuu.gpuvideoandroid.widget.MovieWrapperView;
 import com.daasuu.gpuvideoandroid.widget.PlayerTimer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import java.util.List;
 
 public class PlayerActivity extends AppCompatActivity {
 
-    private static final String STREAM_URL_MP4_VOD_LONG = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4";
+    private static final String STREAM_URL_MP4_VOD_LONG = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4";
 
     public static void startActivity(Activity activity) {
         Intent intent = new Intent(activity, PlayerActivity.class);
@@ -152,21 +150,14 @@ public class PlayerActivity extends AppCompatActivity {
 
 
     private void setUpSimpleExoPlayer() {
-
-        TrackSelector trackSelector = new DefaultTrackSelector();
-
-        // Measures bandwidth during playback. Can be null if not required.
-        DefaultBandwidthMeter defaultBandwidthMeter = new DefaultBandwidthMeter();
-        // Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, "yourApplicationName"), defaultBandwidthMeter);
-        MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(STREAM_URL_MP4_VOD_LONG));
-
         // SimpleExoPlayer
-        player = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
-        // Prepare the player with the source.
-        player.prepare(mediaSource);
-        player.setPlayWhenReady(true);
+        player = new SimpleExoPlayer.Builder(this)
+                .setTrackSelector(new DefaultTrackSelector(this))
+                .build();
 
+        player.addMediaItem(MediaItem.fromUri(Uri.parse(STREAM_URL_MP4_VOD_LONG)));
+        player.prepare();
+        player.setPlayWhenReady(true);
     }
 
 

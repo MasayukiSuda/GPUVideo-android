@@ -23,6 +23,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    compileOnly 'com.google.android.exoplayer:exoplayer-core:2.9.3'
+    compileOnly "com.google.android.exoplayer:exoplayer-core:$exo_player_version"
 
 }
