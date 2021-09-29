@@ -113,7 +113,7 @@ public abstract class MediaEncoder implements Runnable {
         boolean localRequestDrain;
         while (isRunning) {
             synchronized (sync) {
-                Log.d("MediaEncoder", "mRequestDrain "+ requestDrain);
+                //Log.d("MediaEncoder", "RequestDrain "+ requestDrain);
                 localRequestStop = requestStop;
                 localRequestDrain = (requestDrain > 0);
                 if (localRequestDrain)

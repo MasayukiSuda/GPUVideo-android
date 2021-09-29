@@ -117,14 +117,16 @@ public class GlPreviewRenderer extends GlFrameBufferObjectRenderer implements Su
     }
 
     public void setGlFilter(final GlFilter filter) {
+
         glView.queueEvent(new Runnable() {
             @Override
             public void run() {
-                if (glFilter != null) {
+                /*if (glFilter != null) {
                     glFilter.release();
                 }
                 glFilter = filter;
-                isNewShader = true;
+                isNewShader = true;*/
+                setNormalShader(filter);
                 glView.requestRender();
             }
         });

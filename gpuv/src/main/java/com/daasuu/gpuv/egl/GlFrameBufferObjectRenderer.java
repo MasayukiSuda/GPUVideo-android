@@ -22,18 +22,24 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
     private GlFramebufferObject framebufferObject;
     private GlFilter normalShader;
 
+    private boolean isNewShader;
+
     private final Queue<Runnable> runOnDraw;
 
 
     protected GlFrameBufferObjectRenderer() {
+
         runOnDraw = new LinkedList<Runnable>();
+        isNewShader = false;
     }
 
 
     @Override
     public final void onSurfaceCreated(final GL10 gl, final EGLConfig config) {
         framebufferObject = new GlFramebufferObject();
-        normalShader = new GlFilter();
+        if (normalShader == null) {
+            normalShader = new GlFilter();
+        }
         normalShader.setup();
         onSurfaceCreated(config);
     }
@@ -53,6 +59,12 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
                 runOnDraw.poll().run();
             }
         }
+
+        if (isNewShader) {
+            isNewShader = false;
+            normalShader.setup();
+            normalShader.setFrameSize(framebufferObject.getWidth(), framebufferObject.getHeight());
+        }
         framebufferObject.enable();
 
         onDrawFrame(framebufferObject);
@@ -62,6 +74,16 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
         GLES20.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         normalShader.draw(framebufferObject.getTexName(), null);
 
+    }
+
+    public void setNormalShader(GlFilter filter) {
+        synchronized (runOnDraw) {
+            while (!runOnDraw.isEmpty()) {
+                runOnDraw.poll().run();
+            }
+        }
+        normalShader = filter;
+        isNewShader = true;
     }
 
     @Override

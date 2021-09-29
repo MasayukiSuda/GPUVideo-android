@@ -198,6 +198,11 @@ public class BaseCameraActivity extends AppCompatActivity {
                     }
 
                     @Override
+                    public void onCameraThreadStarted() {
+
+                    }
+
+                    @Override
                     public void onVideoFileReady() {
 
                     }
