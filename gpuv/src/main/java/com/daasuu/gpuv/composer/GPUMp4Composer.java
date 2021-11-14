@@ -1,6 +1,8 @@
 package com.daasuu.gpuv.composer;
 
+import android.content.Context;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.util.Log;
 import android.util.Size;
 import com.daasuu.gpuv.egl.filter.GlFilter;
@@ -17,6 +19,7 @@ public class GPUMp4Composer {
 
     private final static String TAG = GPUMp4Composer.class.getSimpleName();
 
+    private Context context;
     private final String srcPath;
     private final String destPath;
     private GlFilter filter;
@@ -35,6 +38,12 @@ public class GPUMp4Composer {
 
 
     public GPUMp4Composer(final String srcPath, final String destPath) {
+        this.srcPath = srcPath;
+        this.destPath = destPath;
+    }
+
+    public GPUMp4Composer(final Context context, final String srcPath, final String destPath) {
+        this.context = context;
         this.srcPath = srcPath;
         this.destPath = destPath;
     }
@@ -122,8 +131,19 @@ public class GPUMp4Composer {
                 final File srcFile = new File(srcPath);
                 final FileInputStream fileInputStream;
                 try {
-                    fileInputStream = new FileInputStream(srcFile);
+                    if (srcPath.contains("content:/")) {
+                        fileInputStream = (FileInputStream) context.getContentResolver().openInputStream(Uri.parse(srcPath));
+                    } else {
+                        fileInputStream = new FileInputStream(srcFile);
+                    }
                 } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    if (listener != null) {
+                        listener.onFailed(e);
+                    }
+                    return;
+                } catch (NullPointerException e) {
+                    Log.e(TAG, "Must have a context when use ScopedStorage");
                     e.printStackTrace();
                     if (listener != null) {
                         listener.onFailed(e);
