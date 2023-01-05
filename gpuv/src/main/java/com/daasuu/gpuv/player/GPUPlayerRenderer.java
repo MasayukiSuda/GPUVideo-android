@@ -10,7 +10,7 @@ import android.view.Surface;
 import com.daasuu.gpuv.egl.*;
 import com.daasuu.gpuv.egl.filter.GlFilter;
 import com.daasuu.gpuv.egl.filter.GlLookUpTableFilter;
-import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ExoPlayer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
@@ -42,7 +42,7 @@ public class GPUPlayerRenderer extends GlFrameBufferObjectRenderer implements Su
 
     private float aspectRatio = 1f;
 
-    private SimpleExoPlayer simpleExoPlayer;
+    private ExoPlayer exoPlayer;
     private Handler uiHandler;
 
     GPUPlayerRenderer(GPUPlayerView glPreview) {
@@ -53,20 +53,17 @@ public class GPUPlayerRenderer extends GlFrameBufferObjectRenderer implements Su
     }
 
     void setGlFilter(final GlFilter filter) {
-        glPreview.queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                if (glFilter != null) {
-                    glFilter.release();
-                    if (glFilter instanceof GlLookUpTableFilter) {
-                        ((GlLookUpTableFilter) glFilter).releaseLutBitmap();
-                    }
-                    glFilter = null;
+        glPreview.queueEvent(() -> {
+            if (glFilter != null) {
+                glFilter.release();
+                if (glFilter instanceof GlLookUpTableFilter) {
+                    ((GlLookUpTableFilter) glFilter).releaseLutBitmap();
                 }
-                glFilter = filter;
-                isNewFilter = true;
-                glPreview.requestRender();
+                glFilter = null;
             }
+            glFilter = filter;
+            isNewFilter = true;
+            glPreview.requestRender();
         });
     }
 
@@ -95,7 +92,7 @@ public class GPUPlayerRenderer extends GlFrameBufferObjectRenderer implements Su
         previewFilter.setup();
 
         Surface surface = new Surface(previewTexture.getSurfaceTexture());
-        uiHandler.post(() -> simpleExoPlayer.setVideoSurface(surface));
+        uiHandler.post(() -> exoPlayer.setVideoSurface(surface));
 
         Matrix.setLookAtM(VMatrix, 0,
                 0.0f, 0.0f, 5.0f,
@@ -173,8 +170,8 @@ public class GPUPlayerRenderer extends GlFrameBufferObjectRenderer implements Su
         glPreview.requestRender();
     }
 
-    void setSimpleExoPlayer(SimpleExoPlayer simpleExoPlayer) {
-        this.simpleExoPlayer = simpleExoPlayer;
+    void setExoPlayer(ExoPlayer exoPlayer) {
+        this.exoPlayer = exoPlayer;
     }
 
     void release() {

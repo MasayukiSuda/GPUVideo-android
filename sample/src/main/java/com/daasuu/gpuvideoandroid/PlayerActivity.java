@@ -18,8 +18,8 @@ import com.daasuu.gpuv.egl.filter.GlFilter;
 import com.daasuu.gpuv.player.GPUPlayerView;
 import com.daasuu.gpuvideoandroid.widget.MovieWrapperView;
 import com.daasuu.gpuvideoandroid.widget.PlayerTimer;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private GPUPlayerView gpuPlayerView;
-    private SimpleExoPlayer player;
+    private ExoPlayer player;
     private Button button;
     private SeekBar timeSeekBar;
     private SeekBar filterSeekBar;
@@ -151,7 +151,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void setUpSimpleExoPlayer() {
         // SimpleExoPlayer
-        player = new SimpleExoPlayer.Builder(this)
+        player = new ExoPlayer.Builder(this)
                 .setTrackSelector(new DefaultTrackSelector(this))
                 .build();
 
@@ -163,7 +163,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void setUoGlPlayerView() {
         gpuPlayerView = new GPUPlayerView(this);
-        gpuPlayerView.setSimpleExoPlayer(player);
+        gpuPlayerView.setExoPlayer(player);
         gpuPlayerView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         ((MovieWrapperView) findViewById(R.id.layout_movie_wrapper)).addView(gpuPlayerView);
         gpuPlayerView.onResume();
@@ -172,17 +172,14 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void setUpTimer() {
         playerTimer = new PlayerTimer();
-        playerTimer.setCallback(new PlayerTimer.Callback() {
-            @Override
-            public void onTick(long timeMillis) {
-                long position = player.getCurrentPosition();
-                long duration = player.getDuration();
+        playerTimer.setCallback(timeMillis -> {
+            long position = player.getCurrentPosition();
+            long duration = player.getDuration();
 
-                if (duration <= 0) return;
+            if (duration <= 0) return;
 
-                timeSeekBar.setMax((int) duration / 1000);
-                timeSeekBar.setProgress((int) position / 1000);
-            }
+            timeSeekBar.setMax((int) duration / 1000);
+            timeSeekBar.setProgress((int) position / 1000);
         });
         playerTimer.start();
     }
