@@ -62,7 +62,7 @@ public class EncodeRenderHandler implements Runnable {
         final EncodeRenderHandler handler = new EncodeRenderHandler(
                 flipVertical,
                 flipHorizontal,
-                fileHeight / fileWidth,
+                fileHeight > fileWidth ? fileHeight / fileWidth : fileWidth / fileHeight,
                 viewAspect,
                 fileWidth,
                 fileHeight,
