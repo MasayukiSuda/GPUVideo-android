@@ -8,6 +8,7 @@ import android.util.Size;
 import com.daasuu.gpuv.egl.filter.GlFilter;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -151,8 +152,10 @@ public class GPUMp4Composer {
                     return;
                 }
 
+                FileDescriptor fileDescriptor;
                 try {
-                    engine.setDataSource(fileInputStream.getFD());
+                    fileDescriptor = fileInputStream.getFD();
+                    engine.setDataSource(fileDescriptor);
                 } catch (IOException e) {
                     e.printStackTrace();
                     if (listener != null) {
@@ -161,8 +164,8 @@ public class GPUMp4Composer {
                     return;
                 }
 
-                final int videoRotate = getVideoRotation(srcPath);
-                final Size srcVideoResolution = getVideoResolution(srcPath, videoRotate);
+                final int videoRotate = getVideoRotation(fileDescriptor);
+                final Size srcVideoResolution = getVideoResolution(fileDescriptor, videoRotate);
 
                 if (filter == null) {
                     filter = new GlFilter();
@@ -266,11 +269,11 @@ public class GPUMp4Composer {
         void onFailed(Exception exception);
     }
 
-    private int getVideoRotation(String videoFilePath) {
+    private int getVideoRotation(FileDescriptor fileDescriptor) {
         MediaMetadataRetriever mediaMetadataRetriever = null;
         try {
             mediaMetadataRetriever = new MediaMetadataRetriever();
-            mediaMetadataRetriever.setDataSource(videoFilePath);
+            mediaMetadataRetriever.setDataSource(fileDescriptor);
             String orientation = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);
             return Integer.valueOf(orientation);
         } catch (IllegalArgumentException e) {
@@ -299,11 +302,11 @@ public class GPUMp4Composer {
         return bitrate;
     }
 
-    private Size getVideoResolution(final String path, final int rotation) {
+    private Size getVideoResolution(final FileDescriptor fileDescriptor, final int rotation) {
         MediaMetadataRetriever retriever = null;
         try {
             retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(path);
+            retriever.setDataSource(fileDescriptor);
             int width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
             int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
 
