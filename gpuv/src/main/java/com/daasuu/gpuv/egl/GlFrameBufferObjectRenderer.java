@@ -2,6 +2,7 @@ package com.daasuu.gpuv.egl;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import com.daasuu.gpuv.egl.filter.GlFilter;
 
@@ -60,6 +61,7 @@ public abstract class GlFrameBufferObjectRenderer implements GLSurfaceView.Rende
         GLES20.glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         GLES20.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GLES20.glViewport(0, 0, framebufferObject.getWidth(), framebufferObject.getHeight());
         normalShader.draw(framebufferObject.getTexName(), null);
 
     }
